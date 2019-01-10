@@ -1,0 +1,121 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Jan  7 15:11:41 2019
+
+@author: wj
+"""
+
+import cv2
+import numpy as np
+
+import os
+import sys
+
+import time
+
+from matplotlib import pyplot as plt
+
+
+def load_img_list(dataset):
+
+    if dataset == 'MSRA-B':
+        path = '/home/wj/wj/leftImg8bit/train/aachen'
+    elif dataset == 'HKU-IS':
+        path = 'dataset/HKU-IS/imgs'
+    elif dataset == 'DUT-OMRON':
+        path = 'dataset/DUT-OMRON/DUT-OMRON-image'
+    elif dataset == 'PASCAL-S':
+        path = 'dataset/PASCAL-S/pascal'
+    elif dataset == 'NTI': 
+        path = 'dataset/NTI/images'
+    elif dataset == 'ECSSD':
+        path = 'dataset/ECSSD/images'
+
+    imgs = os.listdir(path)
+   
+    return path, imgs
+
+
+if __name__ == "__main__":
+    
+    
+
+    datasets = ['MSRA-B']
+  #['MSRA-B', 'HKU-IS', 'DUT-OMRON','PASCAL-S', 'ECSSD', 'NTI']
+  
+    sumval=0
+    num=0
+    sum_Standard_Deviation_h = 0
+    sum_Standard_Deviation_s = 0
+    sum_Standard_Deviation_v = 0
+    sum_valh = 0
+    sum_vals = 0
+    sum_valv = 0
+    for dataset in datasets:
+        path, imgs = load_img_list(dataset)
+        for f_img in imgs:
+            num=num+1
+            img = cv2.imread(os.path.join(path, f_img))
+            HSV=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
+            h,s,v = cv2.split(HSV)
+            s = s/255
+            v = v/255
+            #caculate h
+            wh,Lh =h.shape
+            mxh = h.max()
+            mnh = h.min()
+            valh = h.sum()/(wh*Lh)
+            sum_valh+=valh
+            Standard_Deviation_h = 0;
+            for k in range(wh):
+                for i in range(Lh):
+                    Standard_Deviation_h=Standard_Deviation_h+abs(h[k,i]-valh)
+                        
+            Standard_Deviation_h = Standard_Deviation_h/(wh*Lh)
+            sum_Standard_Deviation_h = sum_Standard_Deviation_h+Standard_Deviation_h
+           
+            ws,Ls =s.shape
+            mxs = s.max()
+            mns = s.min()
+            vals = s.sum()/(ws*Ls)
+            sum_vals+=vals
+            Standard_Deviation_s = 0;
+            for j in range(ws):
+                for z in range(Ls):
+                    Standard_Deviation_s=Standard_Deviation_s+abs(s[j,z]-vals)
+                        
+            Standard_Deviation_s = Standard_Deviation_s/(ws*Ls)
+            sum_Standard_Deviation_s = sum_Standard_Deviation_s+Standard_Deviation_s
+           
+            wv,Lv =v.shape
+            mxv = v.max()
+            mnv = v.min()
+            valv = v.sum()/(wv*Lv)
+            sum_valv+=valv
+            Standard_Deviation_v = 0;
+            for m in range(wv):
+                for n in range(Lv):
+                    Standard_Deviation_v = Standard_Deviation_v+abs(v[m,n]-valv)
+                        
+            Standard_Deviation_v = Standard_Deviation_v/(wv*Lv)
+            sum_Standard_Deviation_v = sum_Standard_Deviation_v + Standard_Deviation_v
+            print('mnh:',mnh,'mns:',mns,'mnv:',mnv)
+            print('mxh:',mxh,'mxs:',mxs,'mxv:',mxv)
+            print('valh:',valh,'vals:',vals,'valv:',valv)
+            print('Standard_Deviation_h:',Standard_Deviation_h,'Standard_Deviation_s:',Standard_Deviation_s,'Standard_Deviation_v:',Standard_Deviation_v)
+           
+            
+            
+        sum_valh=sum_valh/num
+        sum_vals=sum_vals/num
+        sum_valv=sum_valv/num
+        
+        sum_Standard_Deviation_h=sum_Standard_Deviation_h/num
+        sum_Standard_Deviation_s=sum_Standard_Deviation_s/num
+        sum_Standard_Deviation_v=sum_Standard_Deviation_v/num
+        
+        print('sum_valh:',sum_valh,'sum_vals:',sum_vals,'sum_valv:',sum_valv)
+        print('sum_Standard_Deviation_h:',sum_Standard_Deviation_h,'sum_Standard_Deviation_s:',sum_Standard_Deviation_s,'sum_Standard_Deviation_v:',sum_Standard_Deviation_v)
+        print(num)
+           
