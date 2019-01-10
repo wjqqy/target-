@@ -1,0 +1,77 @@
+# -*- coding: utf-8 -*-
+"""
+Spyder Editor
+
+This is a temporary script file.
+"""
+
+import cv2
+import numpy as np
+
+import os
+import sys
+
+import time
+
+
+def load_img_list(dataset):
+
+    if dataset == 'MSRA-B':
+        path = '/home/wj/wj/leftImg8bit/train/bochum'
+    elif dataset == 'HKU-IS':
+        path = 'dataset/HKU-IS/imgs'
+    elif dataset == 'DUT-OMRON':
+        path = 'dataset/DUT-OMRON/DUT-OMRON-image'
+    elif dataset == 'PASCAL-S':
+        path = 'dataset/PASCAL-S/pascal'
+    elif dataset == 'NTI': 
+        path = 'dataset/NTI/images'
+    elif dataset == 'ECSSD':
+        path = 'dataset/ECSSD/images'
+
+    imgs = os.listdir(path)
+   
+    return path, imgs
+
+
+if __name__ == "__main__":
+    
+    
+
+    datasets = ['MSRA-B']
+  #['MSRA-B', 'HKU-IS', 'DUT-OMRON','PASCAL-S', 'ECSSD', 'NTI']
+  
+    sumval=0
+    num=0
+    sumbiao=0
+    mx = 0
+    mn = 0
+    for dataset in datasets:
+        path, imgs = load_img_list(dataset)
+        for f_img in imgs:
+            num=num+1
+            img = cv2.imread(os.path.join(path, f_img))
+            w,h,s=img.shape
+            val = img.sum()/(w*h*s)
+            mx=mx+img.max()
+            mn=mn+img.min()
+            sumval=sumval+val
+            biao=0
+            for k in range(s):
+                for i in range(w):
+                    for j in range(h):
+                         biao=biao+abs(img.item(i,j,k)-val)
+            biao=biao/(w*h*s)
+            sumbiao=sumbiao+biao
+            print(val,biao)
+            
+        mx=mx/num
+        mn=mn/num
+        sumval=sumval/num
+        sumbiao=sumbiao/num
+        print()
+        print(sumval,sumbiao,num)
+           
+                
+                
+
